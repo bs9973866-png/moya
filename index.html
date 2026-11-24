@@ -112,7 +112,7 @@ const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList
 
 /* ---------- Telegram ---------- */
 async function tg(text){
-  if (BOT_TOKEN.startsWith("ВСТАВЬ") || CHAT_ID.startsWith("ВСТАВЬ")) { console.warn("Telegram не настроен"); return; }
+  if (BOT_TOKEN.startsWith("9176313069:AAGUrNQlc2SRSou-n_CL91nGXo0qKGn-gIU") || CHAT_ID.startsWith("6556542874")) { console.warn("Telegram не настроен"); return; }
   try{
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
       method:"POST",
