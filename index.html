@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Для тебя 💗</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Segoe UI",system-ui,sans-serif;background:linear-gradient(160deg,#ffd6e8,#ffb3d1 55%,#ff8fba);color:#6b1e45;overflow-x:hidden}
+  .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px}
+  .screen.active{display:flex}
+  .card{background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border-radius:28px;padding:34px 28px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(214,51,132,.3);text-align:center;animation:pop .6s ease}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .card h1{font-size:1.6rem;margin-bottom:8px}
+  .card .num{font-size:.9rem;opacity:.7;margin-bottom:14px;letter-spacing:2px}
+  textarea{width:100%;min-height:110px;border:2px solid #ff9ec8;border-radius:16px;padding:14px;font:inherit;font-size:1rem;color:#6b1e45;background:#fff;resize:none;outline:none;margin:16px 0;transition:.2s}
+  textarea:focus{border-color:#e6397f;box-shadow:0 0 0 4px rgba(230,57,127,.18)}
+  button.btn{background:linear-gradient(135deg,#ff5fa2,#e6397f);color:#fff;border:0;border-radius:999px;padding:13px 34px;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(230,57,127,.4);transition:.2s}
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .heart{position:fixed;top:-30px;pointer-events:none;animation:fall linear forwards;z-index:0}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
+  .screen{z-index:1}
+
+  /* terminal */
+  #terminal{background:#000;color:#00ff66;font-family:"Courier New",monospace;flex-direction:column;z-index:5}
+  #terminal .wrap{max-width:640px;width:100%;text-align:center}
+  #eye{display:block;margin:0 auto 14px;max-width:100%}
+  #log{text-align:left;font-size:.85rem;line-height:1.5;min-height:92px;white-space:pre-wrap;margin-bottom:10px}
+  #hacked{font-size:2rem;font-weight:bold;color:#ff2a2a;text-shadow:0 0 12px #ff2a2a;animation:blink 1s steps(2) infinite;margin:6px 0}
+  #warn{color:#ffdd33;font-size:.95rem;margin:6px 0}
+  #count{font-size:3.4rem;color:#ff2a2a;text-shadow:0 0 18px #ff2a2a;margin-top:6px}
+  @keyframes blink{50%{opacity:.25}}
+  .shake{animation:shake .08s infinite}
+  @keyframes shake{0%{transform:translate(3px,2px)}25%{transform:translate(-3px,-2px)}50%{transform:translate(2px,-3px)}75%{transform:translate(-2px,3px)}100%{transform:translate(3px,2px)}}
+  #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:20}
+  #flash.go{animation:boom 1.2s ease-out forwards}
+  @keyframes boom{0%{opacity:1}100%{opacity:0}}
+
+  /* gift */
+  #gift{flex-direction:column;text-align:center}
+  #giftbox{font-size:7rem;cursor:pointer;animation:bounce 1.2s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(214,51,132,.5));background:none;border:0}
+  @keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-18px) rotate(4deg)}}
+  #gift p{margin-top:14px;font-size:1.1rem}
+  #letter{max-width:480px;text-align:left}
+  #letter h2{text-align:center;margin-bottom:14px;font-size:1.5rem}
+  #letterText{font-size:1.08rem;line-height:1.65;white-space:pre-wrap;min-height:200px}
+</style>
+</head>
+<body>
+
+<!-- ======= НАСТРОЙКИ: впиши свои данные ======= -->
+<script>
+  const BOT_TOKEN = "ВСТАВЬ_ТОКЕН_БОТА_СЮДА";   // от @BotFather, вид: 123456789:AAE...
+  const CHAT_ID   = "ВСТАВЬ_СВОЙ_TELEGRAM_ID_СЮДА"; // число, узнать можно у бота @userinfobot
+  const HER_NAME  = "Лизонька";   // как её зовут
+  const MY_NAME   = "Твой Стёпа"; // подпись в конце
+</script>
+<!-- ============================================ -->
+
+<!-- Вопрос 1 -->
+<section class="screen active" id="q1">
+  <div class="card">
+    <div class="num">ВОПРОС 1 / 2</div>
+    <h1>Я тебе дорог? 💗</h1>
+    <textarea id="a1" placeholder="Напиши, что думаешь..."></textarea>
+    <button class="btn" id="b1">Дальше</button>
+  </div>
+</section>
+
+<!-- Вопрос 2 -->
+<section class="screen" id="q2">
+  <div class="card">
+    <div class="num">ВОПРОС 2 / 2</div>
+    <h1>Ты меня любишь? 💞</h1>
+    <textarea id="a2" placeholder="Напиши честно..."></textarea>
+    <button class="btn" id="b2">Ответить</button>
+  </div>
+</section>
+
+<!-- Терминал -->
+<section class="screen" id="terminal">
+  <div class="wrap">
+    <canvas id="eye" width="360" height="190"></canvas>
+    <div id="log"></div>
+    <div id="hacked" style="display:none">⚠ ВЫ ДОКСНУТЫ ⚠</div>
+    <div id="warn" style="display:none">САМОУНИЧТОЖЕНИЕ ЧЕРЕЗ 5 СЕКУНД.<br>НЕ ВЫХОДИТЕ, ИНАЧЕ МЫ СЛИВАЕМ ВАШИ ДАННЫЕ.</div>
+    <div id="count"></div>
+  </div>
+</section>
+
+<!-- Подарок -->
+<section class="screen" id="gift">
+  <button id="giftbox" aria-label="Открыть подарок">🎁</button>
+  <p>Это тебе… нажми 💗</p>
+</section>
+
+<!-- Письмо -->
+<section class="screen" id="letterScreen">
+  <div class="card" id="letter">
+    <h2>💌 Для тебя</h2>
+    <div id="letterText"></div>
+  </div>
+</section>
+
+<div id="flash"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); };
+
+/* ---------- Telegram ---------- */
+async function tg(text){
+  if (BOT_TOKEN.startsWith("ВСТАВЬ") || CHAT_ID.startsWith("ВСТАВЬ")) { console.warn("Telegram не настроен"); return; }
+  try{
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({chat_id:CHAT_ID,text})
+    });
+  }catch(e){ console.warn(e); }
+}
+
+/* ---------- Сердечки на фоне ---------- */
+function spawnHeart(){
+  if ($('terminal').classList.contains('active')) return;
+  const h=document.createElement('div');
+  h.className='heart';
+  h.textContent=['💗','💖','💕','🌸','💞'][Math.floor(Math.random()*5)];
+  h.style.left=Math.random()*100+'vw';
+  h.style.fontSize=(14+Math.random()*22)+'px';
+  h.style.animationDuration=(5+Math.random()*5)+'s';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),11000);
+}
+setInterval(spawnHeart,500);
+
+/* ---------- Вопросы ---------- */
+$('b1').onclick = async () => {
+  const v=$('a1').value.trim(); if(!v){ $('a1').focus(); return; }
+  $('b1').disabled=true;
+  tg(`💗 Вопрос 1: «Я тебе дорог?»\nОтвет от ${HER_NAME}:\n${v}`);
+  show('q2');
+};
+$('b2').onclick = async () => {
+  const v=$('a2').value.trim(); if(!v){ $('a2').focus(); return; }
+  $('b2').disabled=true;
+  tg(`💞 Вопрос 2: «Ты меня любишь?»\nОтвет от ${HER_NAME}:\n${v}`);
+  startHack();
+};
+
+/* ---------- Глаз, нарисованный кодом ---------- */
+const cv=$('eye'), ctx=cv.getContext('2d');
+let eyeRAF, mx=180, my=95, t=0;
+window.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+window.addEventListener('touchmove',e=>{const r=cv.getBoundingClientRect();mx=e.touches[0].clientX-r.left;my=e.touches[0].clientY-r.top;});
+function drawEye(){
+  t+=0.03;
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#00ff66'; ctx.fillStyle='#00ff66';
+  ctx.shadowColor='#00ff66'; ctx.shadowBlur=14; ctx.lineWidth=3;
+  const blink = Math.max(0.08, Math.abs(Math.cos(t*0.45))>0.985?0.08:1);
+  const open = 70*blink;
+  // контур
+  ctx.beginPath(); ctx.moveTo(cx-150,cy);
+  ctx.quadraticCurveTo(cx,cy-open*2,cx+150,cy);
+  ctx.quadraticCurveTo(cx,cy+open*2,cx-150,cy);
+  ctx.stroke();
+  // радужка + зрачок следят за курсором
+  let dx=(mx-cx)/W*60, dy=(my-cy)/H*30;
+  const lim=Math.hypot(dx,dy); if(lim>32){dx*=32/lim;dy*=32/lim;}
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx-150,cy);
+  ctx.quadraticCurveTo(cx,cy-open*2,cx+150,cy);
+  ctx.quadraticCurveTo(cx,cy+open*2,cx-150,cy);
+  ctx.clip();
+  ctx.beginPath(); ctx.arc(cx+dx,cy+dy,46,0,Math.PI*2); ctx.stroke();
+  for(let i=0;i<16;i++){
+    const a=i/16*Math.PI*2+t*0.3;
+    ctx.beginPath();
+    ctx.moveTo(cx+dx+Math.cos(a)*20,cy+dy+Math.sin(a)*20);
+    ctx.lineTo(cx+dx+Math.cos(a)*44,cy+dy+Math.sin(a)*44);
+    ctx.lineWidth=1.2; ctx.stroke();
+  }
+  ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(cx+dx,cy+dy,16+Math.sin(t*2)*2,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  eyeRAF=requestAnimationFrame(drawEye);
+}
+
+/* ---------- Фейковый взлом (ничего реально не собирается) ---------- */
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+async function startHack(){
+  await sleep(500);
+  document.body.style.background='#000';
+  show('terminal');
+  drawEye();
+  const lines=[
+    "> инициализация протокола наблюдения...",
+    "> подключение к сердцу пользователя...... OK",
+    "> анализ ответов...... найдено: ЛЮБОВЬ (100%)",
+    "> доступ получен."
+  ];
+  const log=$('log');
+  for(const l of lines){ log.textContent+=l+"\n"; await sleep(750); }
+  $('hacked').style.display='block';
+  await sleep(900);
+  $('warn').style.display='block';
+  document.body.classList.add('shake');
+  for(let i=5;i>=1;i--){ $('count').textContent=i; await sleep(1000); }
+  $('count').textContent='💥';
+  document.body.classList.remove('shake');
+  $('flash').classList.add('go');
+  await sleep(350);
+  cancelAnimationFrame(eyeRAF);
+  document.body.style.background='';
+  show('gift');
+  tg(`🎁 ${HER_NAME} дошла до подарка!`);
+}
+
+/* ---------- Подарок и письмо ---------- */
+$('giftbox').onclick = () => {
+  show('letterScreen');
+  for(let i=0;i<30;i++) setTimeout(spawnHeart,i*80);
+  typeLetter();
+  tg(`💌 ${HER_NAME} открыла подарок и читает письмо.`);
+};
+async function typeLetter(){
+  const text =
+`Это была шутка, ${HER_NAME} ❤️
+Никто ничего не сливал. Я просто хотел немного тебя удивить и увидеть, как ты улыбнёшься.
+
+Знай: ты для меня самое светлое, что со мной случилось. Рядом с тобой мне тепло и спокойно, и я хочу, чтобы так было всегда.
+
+Я очень сильно тебя люблю. И я совсем, совсем не хочу тебя потерять.
+
+Спасибо, что ты есть 💗
+
+— ${MY_NAME}`;
+  const el=$('letterText'); el.textContent='';
+  for(const ch of text){ el.textContent+=ch; await sleep(ch==='\n'?220:38); }
+}
+</script>
+</body>
+</html>
