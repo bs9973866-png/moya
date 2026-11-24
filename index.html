@@ -52,7 +52,7 @@
 
 <!-- ======= НАСТРОЙКИ: впиши свои данные ======= -->
 <script>
-  const BOT_TOKEN = "9176313069:AAGUrNQlc2SRSou-n_CL91nGXo0qKGn-gIU";   // от @BotFather, вид: 123456789:AAE...
+  const BOT_TOKEN = "9176313069:AAGyPcIlmdL0GA05uDRIX7q9UR04N9AP9O8";   // от @BotFather, вид: 123456789:AAE...
   const CHAT_ID   = "6556542874"; // число, узнать можно у бота @userinfobot
   const HER_NAME  = "Лизонька";   // как её зовут
   const MY_NAME   = "Стёпа"; // подпись в конце
@@ -112,7 +112,7 @@ const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList
 
 /* ---------- Telegram ---------- */
 async function tg(text){
-  if (BOT_TOKEN.startsWith("9176313069:AAGUrNQlc2SRSou-n_CL91nGXo0qKGn-gIU") || CHAT_ID.startsWith("6556542874")) { console.warn("Telegram не настроен"); return; }
+  if (BOT_TOKEN.startsWith("ВСТАВЬ") || CHAT_ID.startsWith("ВСТАВЬ")) { console.warn("Telegram не настроен"); return; }
   try{
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
       method:"POST",
